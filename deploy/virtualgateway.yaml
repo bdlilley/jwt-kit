@@ -1,0 +1,16 @@
+---
+apiVersion: networking.gloo.solo.io/v2
+kind: VirtualGateway
+metadata:
+  name: platform-ingress
+  namespace: gloo-mesh
+spec:
+  listeners:
+  - http: {}
+    port:
+      number: 80
+  workloads:
+  - selector:
+      cluster: mgmt-cluster
+      labels:
+        istio: ingressgateway

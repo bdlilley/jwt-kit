@@ -1,0 +1,38 @@
+---
+apiVersion: networking.gloo.solo.io/v2
+kind: RouteTable
+metadata:
+  name: httpbin
+  namespace: gloo-mesh
+spec:
+  hosts:
+    - "*"
+  virtualGateways:
+    - name: platform-ingress
+      namespace: gloo-mesh
+      cluster: mgmt-cluster
+  http:
+    - name: sanity
+      matchers:
+        - uri:
+            prefix: /sanity
+      labels:
+        route: sanity
+      directResponse:
+        status: 200
+        body: "it's alive"
+    - name: httpbin
+      labels:
+        route: httpbin
+      matchers:
+        - uri:
+            prefix: /httpbin
+      forwardTo:
+        pathRewrite: /
+        destinations:
+        - ref:
+            name: httpbin
+            namespace: default
+          port:
+            name: http
+          kind: SERVICE

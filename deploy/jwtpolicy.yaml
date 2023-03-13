@@ -1,0 +1,31 @@
+---
+apiVersion: security.policy.gloo.solo.io/v2
+kind: JWTPolicy
+metadata:
+  name: httpbin
+  namespace: gloo-mesh
+spec:
+  applyToRoutes:
+  - route:
+      labels:
+        route: httpbin
+  config:
+    phase:
+      preAuthz: {}
+    providers:
+      solo-fake:
+        # If used, the issuer must == the host of the request
+        # issuer: "https://bensolo-io.github.io/jwt-kit"
+        audiences:
+        - https://fake-resource.solo.io
+        remote:
+          url: https://bensolo-io.github.io/jwt-kit/.well-known/jwks.json
+          destinationRef:
+            ref:
+              name: fake-idp
+              namespace: gloo-mesh
+              cluster: mgmt-cluster
+            kind: EXTERNAL_SERVICE
+            port:
+              number: 443
+        keepToken: true
