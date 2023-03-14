@@ -1,6 +1,6 @@
 # jwt-kit
 
-Simple fake idp and jwt generator for testing code that uses jwts.
+Simple fake idp and jwt generator for testing code that uses jwts.  Contains 2 different providers with embedded private keys and public jwks in github.
 
 ### Quickstart
 
@@ -38,11 +38,15 @@ x-envoy-upstream-service-time: 1
 ```
 jwt-kit -h
 
-Jwt-kit contains an embedded keypair used to sign jwts.
+Jwt-kit contains embedded keypairs to sign JWTs as an IDP would.
 
-Public JWKS url: https://bensolo-io.github.io/jwt-kit/.well-known/jwks.json
+Provider1:
+  Public JWKS url: https://bensolo-io.github.io/jwt-kit/provider1/.well-known/jwks.json
+  Issuer name: https://bensolo-io.github.io/jwt-kit/provider1
 
-Issuer name: https://bensolo-io.github.io/jwt-kit
+Provider2:
+  Public JWKS url: https://bensolo-io.github.io/jwt-kit/provider2/.well-known/jwks.json
+  Issuer name: https://bensolo-io.github.io/jwt-kit/provider2
 
 Usage:
   jwt-kit [flags]
@@ -52,7 +56,8 @@ Flags:
   -c, --claims stringArray      add jwt claims
   -e, --expires-in string       expires duration (uses https://pkg.go.dev/time#ParseDuration) (default "8766h")
   -h, --help                    help for jwt-kit
-  -p, --pretty-print            pretty print the token
+  -j, --json                    output full token signed details as JSON
+  -p, --provider string         provider to use (provider1, provider2) (default "provider1")
   -s, --scopes stringArray      add jwt scopes
   -u, --subject string          jwt subject (default "glooey@solo.io")
 ```
@@ -67,10 +72,10 @@ jwt-kit
 eyJhbGciOiJSUzI1NiIsImtpZCI6ImZPcFdRT0pfc1NrQXp6djVOVTFqZnk5UDZuT3d6OXVkVWV3MjZmZXJZTXMiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOlsiaHR0cHM6Ly9mYWtlLXJlc291cmNlLnNvbG8uaW8iXSwiYmVlcl9vZl90aGVfZGF5IjoiVHdvIEhlYXJ0ZWQgQWxlIiwiZXhwIjoxNjc4ODAyNjg2LCJpc3MiOiJodHRwczovL2JlbnNvbG8taW8uZ2l0aHViLmlvL2p3dC1raXQiLCJzY29wZXMiOltdLCJzdWIiOiJnbG9vZXlAc29sby5pbyJ9.MBlP2zLN4FANiyvRMXqsXtBmOfS8yOSZqEq6oRIWpnF8zt_JUIpVWHMbWlVGwDZ7dEqsup_LsAsvXXruLYKpxNLOZNqQFUPPQTmSMmPqwfe_tANsKEf8SkkNWV_emNW_cYnobe3QzsxAhG9Lg1xupN2jb8O97951mVIMavdImOwcvS5-xBD7ruT3WHX4w5lOoFnGLizuQO4lhAfFCwwdtx5jrhOADwhM4x_Lyd74poUpbyqtPWjQ-aslMbgSCcNwM6OHK9D0cgdTaGEhZg7KaooBvITb0DU46mXF-1vcWxkB7p2J7hLrQdndCsld6vdS2E0dl9ZB9hWi85VtIFVynQ
 ```
 
-Pretty print to see the token details:
+Specifiy JSON output to view token details (the signed token string is in `Raw` field):
 
 ```bash
-jwt-kit -p
+jwt-kit -j
 
 {
   "Raw": "eyJhbG...",
@@ -89,7 +94,7 @@ jwt-kit -p
     ],
     "beer_of_the_day": "Westmalle Trappist Tripel",
     "exp": 1678802041,
-    "iss": "https://bensolo-io.github.io/jwt-kit",
+    "iss": "https://bensolo-io.github.io/jwt-kit/provider1",
     "scopes": [],
     "sub": "glooey@solo.io"
   },

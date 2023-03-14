@@ -36,13 +36,16 @@ Provider1:
   Public JWKS url: %s
   Issuer name: %s
 
-`, idp.Provider1.JWKSUrl, idp.Provider1.Issuer),
+Provider2:
+  Public JWKS url: %s
+  Issuer name: %s
+`, idp.Provider1.JWKSUrl, idp.Provider1.Issuer, idp.Provider2.JWKSUrl, idp.Provider2.Issuer),
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		var errs []string
 
 		config.Provider = strings.ToLower(config.Provider)
 		if config.Provider != "provider1" && config.Provider != "provider2" {
-			errs = append(errs, fmt.Sprintf("invalid provider '%s', must be one of provider1,provider2"))
+			errs = append(errs, fmt.Sprintf("invalid provider '%s', must be one of provider1,provider2", config.Provider))
 		}
 
 		for _, c := range config.Claims {
