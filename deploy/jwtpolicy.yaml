@@ -15,11 +15,11 @@ spec:
     providers:
       solo-fake:
         # If used, the issuer must == the host of the request
-        # issuer: "https://bensolo-io.github.io/jwt-kit"
+        # issuer: "https://bensolo-io.github.io/jwt-kit/provider1"
         audiences:
         - https://fake-resource.solo.io
         remote:
-          url: https://bensolo-io.github.io/jwt-kit/.well-known/jwks.json
+          url: https://bensolo-io.github.io/jwt-kit/provider1/.well-known/jwks.json
           destinationRef:
             ref:
               name: fake-idp
