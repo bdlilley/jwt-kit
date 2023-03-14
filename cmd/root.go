@@ -19,24 +19,31 @@ type Config struct {
 	Audiences   []string
 	Exp         string
 	Sub         string
+	Provider    string
 	claimsMap   jwt.MapClaims
 	expDuration time.Duration
-	PrettyPrint bool
+	OutputJSON  bool
 }
 
 var config Config = Config{claimsMap: make(map[string]interface{})}
 
 var rootCmd = &cobra.Command{
 	Use:   "jwt-kit",
-	Short: "jwt-kit - a simple CLI to generate JWTs using a development IDP",
-	Long: fmt.Sprintf(`Jwt-kit contains an embedded keypair used to sign jwts.
+	Short: "jwt-kit - a simple CLI to generate JWTs using development IDPs",
+	Long: fmt.Sprintf(`Jwt-kit contains embedded keypairs to sign JWTs as an IDP would.
 
-Public JWKS url: %s
+Provider1:
+  Public JWKS url: %s
+  Issuer name: %s
 
-Issuer name: %s
-`, idp.JWKSUrl, idp.Issuer),
+`, idp.Provider1.JWKSUrl, idp.Provider1.Issuer),
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		var errs []string
+
+		config.Provider = strings.ToLower(config.Provider)
+		if config.Provider != "provider1" && config.Provider != "provider2" {
+			errs = append(errs, fmt.Sprintf("invalid provider '%s', must be one of provider1,provider2"))
+		}
 
 		for _, c := range config.Claims {
 			parts := strings.Split(c, "=")
@@ -54,22 +61,30 @@ Issuer name: %s
 		}
 
 		if len(errs) > 0 {
-			return fmt.Errorf("claims validation errors: %s", strings.Join(errs, "; "))
+			return fmt.Errorf("validation errors: %s", strings.Join(errs, "; "))
 		}
 		gofakeit.Seed(time.Now().UnixNano())
 		config.claimsMap["beer_of_the_day"] = gofakeit.BeerName()
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		theJwt := getUnsignedJwt()
+		var provider *idp.Provider
+		switch config.Provider {
+		case "provider1":
+			provider = idp.Provider1
+		case "provider2":
+			provider = idp.Provider2
+		}
 
-		tokenString, err := theJwt.SignedString(idp.GetRSAPrivateKey())
+		theJwt := getUnsignedJwt(provider)
+
+		tokenString, err := theJwt.SignedString(provider.RsaPrivateKey)
 		if err != nil {
 			return err
 		}
 
-		if config.PrettyPrint {
-			theToken, err := parseSignedJwtString(tokenString)
+		if config.OutputJSON {
+			theToken, err := parseSignedJwtString(provider, tokenString)
 			if err != nil {
 				return err
 			}
@@ -92,7 +107,8 @@ func Execute() {
 	rootCmd.Flags().StringArrayVarP(&config.Audiences, "audiences", "a", []string{"https://fake-resource.solo.io"}, "jwt audience")
 	rootCmd.Flags().StringVarP(&config.Exp, "expires-in", "e", "8766h", "expires duration (uses https://pkg.go.dev/time#ParseDuration)")
 	rootCmd.Flags().StringVarP(&config.Sub, "subject", "u", "glooey@solo.io", "jwt subject")
-	rootCmd.Flags().BoolVarP(&config.PrettyPrint, "pretty-print", "p", false, "pretty print the token")
+	rootCmd.Flags().BoolVarP(&config.OutputJSON, "json", "j", false, "output full token signed details as JSON")
+	rootCmd.Flags().StringVarP(&config.Provider, "provider", "p", "provider1", "provider to use (provider1, provider2)")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "Whoops. There was an error while executing your CLI '%s'", err)
@@ -100,14 +116,14 @@ func Execute() {
 	}
 }
 
-func getUnsignedJwt() *jwt.Token {
+func getUnsignedJwt(provider *idp.Provider) *jwt.Token {
 	token := jwt.New(jwt.SigningMethodRS256)
-	token.Header["kid"] = idp.Kid
+	token.Header["kid"] = provider.KID
 
 	now := time.Now().UTC()
 
 	config.claimsMap["exp"] = now.Add(config.expDuration).Unix()
-	config.claimsMap["iss"] = idp.Issuer
+	config.claimsMap["iss"] = provider.Issuer
 	config.claimsMap["aud"] = config.Audiences
 	config.claimsMap["sub"] = config.Sub
 	config.claimsMap["scopes"] = config.Scopes
@@ -116,12 +132,12 @@ func getUnsignedJwt() *jwt.Token {
 	return token
 }
 
-func parseSignedJwtString(token string) (*jwt.Token, error) {
+func parseSignedJwtString(provider *idp.Provider, token string) (*jwt.Token, error) {
 	t, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("unexpected method: %s", t.Header["alg"])
 		}
-		return idp.GetRSAPublicKey(), nil
+		return provider.RsaPublicKey, nil
 	})
 	if err != nil {
 		return nil, err
