@@ -41,12 +41,12 @@ jwt-kit -h
 Jwt-kit contains embedded keypairs to sign JWTs as an IDP would.
 
 Provider1:
-  Public JWKS url: https://bensolo-io.github.io/jwt-kit/provider1/.well-known/jwks.json
-  Issuer name: https://bensolo-io.github.io/jwt-kit/provider1
+  Public JWKS url: https://bdlilley.github.io/jwt-kit/provider1/.well-known/jwks.json
+  Issuer name: https://bdlilley.github.io/jwt-kit/provider1
 
 Provider2:
-  Public JWKS url: https://bensolo-io.github.io/jwt-kit/provider2/.well-known/jwks.json
-  Issuer name: https://bensolo-io.github.io/jwt-kit/provider2
+  Public JWKS url: https://bdlilley.github.io/jwt-kit/provider2/.well-known/jwks.json
+  Issuer name: https://bdlilley.github.io/jwt-kit/provider2
 
 Usage:
   jwt-kit [flags]
@@ -94,7 +94,7 @@ jwt-kit -j
     ],
     "beer_of_the_day": "Westmalle Trappist Tripel",
     "exp": 1678802041,
-    "iss": "https://bensolo-io.github.io/jwt-kit/provider1",
+    "iss": "https://bdlilley.github.io/jwt-kit/provider1",
     "scopes": [],
     "sub": "glooey@solo.io"
   },
@@ -126,7 +126,7 @@ jwt-kit -e 24h -c my-claim=my-value -c color=orange -a https://some-resource -u 
     "beer_of_the_day": "Trappistes Rochefort 8",
     "color": "orange",
     "exp": 1678888566,
-    "iss": "https://bensolo-io.github.io/jwt-kit",
+    "iss": "https://bdlilley.github.io/jwt-kit",
     "my-claim": "my-value",
     "scopes": [
       "openid",
@@ -145,7 +145,7 @@ Private keys are embedded in [./internal/idp/keys.go](./internal/idp/keys.go) ..
 
 ### Public JWKS
 
-Public JWKS is hosted at https://bensolo-io.github.io/jwt-kit/.well-known/jwks.json.
+Public JWKS is hosted at https://bdlilley.github.io/jwt-kit/.well-known/jwks.json.
 
 ### TODO
 

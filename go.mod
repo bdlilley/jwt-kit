@@ -1,4 +1,4 @@
-module github.com/bensolo-io/jwt-kit
+module github.com/bdlilley/jwt-kit
 
 go 1.19
 

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bensolo-io/jwt-kit/internal/idp"
+	"github.com/bdlilley/jwt-kit/internal/idp"
 	"github.com/brianvoe/gofakeit"
 	"github.com/golang-jwt/jwt"
 	"github.com/spf13/cobra"
