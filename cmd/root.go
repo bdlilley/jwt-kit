@@ -129,7 +129,7 @@ func getUnsignedJwt(provider *idp.Provider) *jwt.Token {
 	config.claimsMap["iss"] = provider.Issuer
 	config.claimsMap["aud"] = config.Audiences
 	config.claimsMap["sub"] = config.Sub
-	config.claimsMap["scopes"] = config.Scopes
+	config.claimsMap["scope"] = strings.Join(config.Scopes, " ")
 	token.Claims = config.claimsMap
 
 	return token
